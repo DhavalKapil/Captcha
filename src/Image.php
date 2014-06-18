@@ -92,7 +92,7 @@ class Image
     /**
      * Public constructor
      */
-    public function __construct($text = NULL, $font = NULL, $fontSize = NULL, $padding = NULL, $backgroundColor = NULL, $textColor = NULL)
+    public function __construct($text = NULL, $font = NULL, $fontSize = NULL, $padding = NULL, $backgroundColor = NULL, $textColor = NULL, $angle = NULL)
     {
         if(NULL === $text)
         {
@@ -101,10 +101,7 @@ class Image
 
         if(NULL === $font)
         {
-            //$font = "../fonts/LucidaBrightRegular.ttf";
-            $font = __DIR__."/LucidaBrightRegular.ttf";
-
-            //$font = "/home/pavilion/Documents/git_projects/Captcha/fonts/LucidaBrightRegular.ttf";
+            $font = __DIR__."/../fonts/LucidaBrightRegular.ttf";
         }
 
         if(NULL === $fontSize)
@@ -127,12 +124,18 @@ class Image
             $textColor = "#aa7744";
         }
 
+        if(NULL === $angle)
+        {
+            $angle = 10;
+        }
+
         $this->text = $text;
         $this->font = $font;
         $this->fontSize = $fontSize;
         $this->padding = $padding;
         $this->backgroundColor = $backgroundColor;
         $this->textColor = $textColor;
+        $this->angle = $angle;
     }
 
     /**
@@ -307,6 +310,9 @@ class Image
 
         // Adding text
         imagefttext($this->captchaImage, $this->fontSize, 0, $this->textX, $this->textY, $textColor, $this->font, $this->text);
+
+        // Rotating image
+        $this->captchaImage = imagerotate($this->captchaImage, $this->angle, $backgroundColor);
     }
 
     /**
