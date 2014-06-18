@@ -83,6 +83,13 @@ class Image
 	protected $angle;
 
     /**
+     * Array of lines to be inserted
+     *
+     * @var array
+     */
+    protected $lines;
+
+    /**
      * The captcha image
      *
      * @var resource
@@ -92,7 +99,7 @@ class Image
     /**
      * Public constructor
      */
-    public function __construct($text = NULL, $font = NULL, $fontSize = NULL, $padding = NULL, $backgroundColor = NULL, $textColor = NULL, $angle = NULL)
+    public function __construct($text = NULL, $font = NULL, $fontSize = NULL, $padding = NULL, $backgroundColor = NULL, $textColor = NULL, $angle = NULL, $lines = NULL)
     {
         if(NULL === $text)
         {
@@ -136,6 +143,10 @@ class Image
         $this->backgroundColor = $backgroundColor;
         $this->textColor = $textColor;
         $this->angle = $angle;
+        $this->lines = $lines;
+
+        // Generating the image
+        $this->generateImage();
     }
 
     /**
@@ -149,6 +160,9 @@ class Image
     public function setText()
     {
         $this->text = $text;
+
+        // Generating the new image
+        $this->generateImage();
     }
 
     public function getFont()
@@ -159,6 +173,9 @@ class Image
     public function setFont($font)
     {
         $this->font = $font;
+
+        // Generating the new image
+        $this->generateImage();
     }
 
     public function getFontSize()
@@ -169,6 +186,9 @@ class Image
     public function setFontSize($fontSize)
     {
         $this->fontSize = $fontSize;
+
+        // Generating the new image
+        $this->generateImage();
     }
 
     public function getPadding()
@@ -179,6 +199,9 @@ class Image
     public function setPadding($padding)
     {
         $this->padding = $padding;
+
+        // Generating the new image
+        $this->generateImage();
     }
 
     public function getContainerWidth()
@@ -186,19 +209,9 @@ class Image
         return $this->containerWidth;
     }
 
-    public function setContainerWidth($containerWidth)
-    {
-        $this->containerWidth = $containerWidth;
-    }
-
     public function getContainerHeight()
     {
         return $this->containerHeight;
-    }
-
-    public function setContainerHeight($containerHeight)
-    {
-        $this->containerHeight = $containerHeight;
     }
 
     public function getTextX()
@@ -206,19 +219,9 @@ class Image
         return $this->textX;
     }
 
-    public function setTextX($textX)
-    {
-        $this->textX = $textX;
-    }
-
     public function getTextY()
     {
         return $this->textY;
-    }
-
-    public function setTextY($textY)
-    {
-        $this->textY = $textY;
     }
 
     public function getBackgroundColor()
@@ -229,6 +232,9 @@ class Image
     public function setBackgroundColor($backgroundColor)
     {
         $this->backgroundColor = $backgroundColor;
+
+        // Generating the new image
+        $this->generateImage();
     }
 
     public function getTextColor()
@@ -239,6 +245,9 @@ class Image
     public function setTextColor($textColor)
     {
         $this->textColor = $textColor;
+
+        // Generating the new image
+        $this->generateImage();
     }
 
     public function getAngle()
@@ -249,16 +258,27 @@ class Image
     public function setAngle($angle)
     {
         $this->angle = $angle;
+
+        // Generating the new image
+        $this->generateImage();
+    }
+
+    public function getLines()
+    {
+        return $this->lines;
+    }
+
+    public function setLines($lines)
+    {
+        $this->lines = $lines;
+
+        // Generating the new image
+        $this->generateImage();
     }
 
     public function getCaptchaImage()
     {
         return $this->captchaImage;
-    }
-
-    public function setCaptchaImage($captchaImage)
-    {
-        $this->captchaImage = $captchaImage;
     }
 
     /**
@@ -282,7 +302,7 @@ class Image
     /**
      * Function to make a box where text will fit in
      */
-    public function makeBox()
+    private function makeBox()
     {
         $wordBox = imageftbbox($this->fontSize, 0, $this->font, $this->text);
 
@@ -299,7 +319,7 @@ class Image
     /**
      * Function to create the image
      */
-    public function createImage()
+    private function createImage()
     {
         // Creatint the image
         $this->captchaImage = imagecreate($this->containerWidth, $this->containerHeight);
@@ -315,6 +335,31 @@ class Image
         $this->captchaImage = imagerotate($this->captchaImage, $this->angle, $backgroundColor);
     }
 
+
+    /**
+     * Function to add lines in captcha
+     */
+    private function addLines()
+    {
+        foreach($this->lines as $line)
+        {
+            $lineColor = $this->makeColor($line->getColor(), $this->captchaImage);
+
+            // Adding line
+            imageline($this->captchaImage, $line->getXStart(), $line->getYStart(), $line->getXEnd(), $line->getYEnd(), $lineColor);
+        }
+    }
+
+    /**
+     * Function to call all above functions and output the image
+     */
+    public function generateImage()
+    {
+        $this->makeBox();
+        $this->createImage();
+        $this->addLines();
+    }
+
     /**
      * Function to render the image
      */
@@ -324,5 +369,4 @@ class Image
         header('Content-Type:image/png');
 
         imagepng($this->captchaImage);
-    }
-}
+    }}
