@@ -361,6 +361,18 @@ class Image
     }
 
     /**
+     * Function to set noticeably different colors for text and background
+     * Will change background color
+     */
+    public function adjustBackgroundColor()
+    {
+        while( Color::areNoticeable($this->backgroundColor, $this->textColor) !== TRUE )
+        {
+            $this->backgroundColor = Color::getRandomColor();
+        }
+    }
+
+    /**
      * Function to call all above functions and output the image
      */
     public function generateImage()
