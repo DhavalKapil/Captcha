@@ -62,16 +62,16 @@ class Image
     protected $textY;
 
 	/**
-	 * Hex of the background color
+	 * Color of the background
 	 *
-	 * @var string
+	 * @var Color
 	 */
 	protected $backgroundColor;
 
 	/**
-	 * Hex of the text color
+	 * Color of the text
 	 *
-	 * @var string
+	 * @var Color
 	 */
 	protected $textColor;
 
@@ -123,17 +123,17 @@ class Image
 
         if(NULL === $backgroundColor)
         {
-            $backgroundColor = "#225588";
+            $backgroundColor = Color::getRandomColor();
         }
 
         if(NULL === $textColor)
         {
-            $textColor = "#aa7744";
+            $textColor = Color::getRandomColor();
         }
 
         if(NULL === $angle)
         {
-            $angle = 10;
+            $angle = rand(-30, 30);
         }
 
         $this->text = $text;
@@ -288,13 +288,8 @@ class Image
      */
     private function makeColor($color)
     {
-        $color = str_replace("#", "", $color);
-        $redComponent = hexdec(substr($color, 0, 2));
-        $greenComponent = hexdec(substr($color, 2, 2));
-        $blueComponent = hexdec(substr($color, 4, 2));
-
         // Allocating color to image
-        $colorIdentifier = imagecolorallocate($this->captchaImage, $redComponent, $greenComponent, $blueComponent);
+        $colorIdentifier = imagecolorallocate($this->captchaImage, $color->getRed(), $color->getGreen(), $color->getBlue());
 
         return $colorIdentifier;
     }
@@ -341,12 +336,27 @@ class Image
      */
     private function addLines()
     {
-        foreach($this->lines as $line)
+        if(isset($this->lines))
         {
-            $lineColor = $this->makeColor($line->getColor(), $this->captchaImage);
+            foreach($this->lines as $line)
+            {
+                $lineColor = $this->makeColor($line->getColor(), $this->captchaImage);
 
-            // Adding line
-            imageline($this->captchaImage, $line->getXStart(), $line->getYStart(), $line->getXEnd(), $line->getYEnd(), $lineColor);
+                // Adding line
+                imageline($this->captchaImage, $line->getXStart(), $line->getYStart(), $line->getXEnd(), $line->getYEnd(), $lineColor);
+            }
+        }
+    }
+
+    /**
+     * Function to set noticeably different colors for text and background
+     * Will change text color
+     */
+    public function adjustTextColor()
+    {
+        while( Color::areNoticeable($this->backgroundColor, $this->textColor) !== TRUE )
+        {
+            $this->textColor = Color::getRandomColor();
         }
     }
 

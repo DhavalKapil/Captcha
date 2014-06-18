@@ -9,7 +9,7 @@ class Line
 	/**
 	 * Hex of the line color
 	 *
-	 * @var string
+	 * @var Color
 	 */
 	protected $color;
 
