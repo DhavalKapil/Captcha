@@ -176,9 +176,9 @@ class Color
 	}
 
 	/**
-	 * Function used to calculate the distance metric between two colors
+	 * Function used to calculate the distance metric between two colors according to CIE76
 	 */
-	public static function getDistanceMetric($color1, $color2)
+	public static function getDistanceMetricCIE76($color1, $color2)
 	{
 		$temp = pow( $color1->getL() - $color2->getL() , 2 );
 		$temp += pow( $color1->getA() - $color2->getA() , 2 );
@@ -188,6 +188,31 @@ class Color
 
 		return $temp;
 	}
+	
+	/**
+	 * Function used to calculate the distance metric between two colors according to CIE94 (more accurate than above)
+	 */
+	public static function getDistanceMetricCIE94($color1, $color2)
+	{
+		$delL = $color1->getL() - $color2->getL();
+		$c1 = sqrt( pow($color1->getA(), 2) + pow($color1->getB(), 2) );
+		$c2 = sqrt( pow($color2->getA(), 2) + pow($color2->getB(), 2) );
+		$delC = $c1 - $c2;
+		$delH = sqrt( pow(Color::getDistanceMetricCIE76($color1, $color2), 2) - pow($delL, 2) - pow($delC, 2) );
+
+		$cx = sqrt( $c1*$c2 );
+		$sL = 1;
+		$sC = 1 + 0.045*$cx;
+		$sH = 1 + 0.015*$cx;
+
+		$temp = pow( $delL/$sL , 2);
+		$temp += pow( $delC/$sC, 2);
+		$temp += pow( $delH/$sH, 2);
+
+		$delE = sqrt($temp);
+
+		return $delE;
+	}
 
 	/**
 	 * Function that checks whether two colors are noticeable or not
@@ -196,7 +221,7 @@ class Color
 	 */
 	public static function areNoticeable($color1, $color2)
 	{
-		if(Color::getDistanceMetric($color1, $color2) >= 50)	// 2.3 according to standards
+		if(Color::getDistanceMetricCIE94($color1, $color2) >= 50)	// 2.3 according to standards
 		{
 			return TRUE;
 		}
