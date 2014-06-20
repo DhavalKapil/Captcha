@@ -65,6 +65,45 @@ class Captcha
 	}
 
 	/**
+	 * Function to add random lines
+	 *
+	 * @param number $noOfLines - the no of lines and Color $color for setting the color
+	 */
+	public function addLines($noOfLines, $color=NULL)
+	{
+		$lines = array();
+
+		for($i = 0;$i<$noOfLines;$i++)
+		{
+			$line = new Line;
+
+			if(NULL == $color)
+			{	
+				$line->setColor(Color::getRandomColor());
+			}
+			else
+			{
+				$line->setColor($color);
+			}
+
+			$line->randomize(0, $this->image->getContainerWidth(), 0, $this->image->getContainerHeight());
+
+			array_push($lines, $line);
+		}
+
+		if(NULL == $this->lines)
+		{
+			$this->lines = $lines;
+		}
+		else
+		{
+			$this->lines = array_merge($this->lines, $lines);
+		}
+
+		$this->image->setLines($this->lines);
+	}
+
+	/**
 	 * Function to display the CAPTCHA
 	 *
 	 * @param bool $adjust that tells whether to adjust the background color to make CAPTCHA more visible
