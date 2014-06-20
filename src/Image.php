@@ -103,7 +103,7 @@ class Image
     {
         if(NULL === $text)
         {
-            $text = "Test!";
+            $text = Image::getRandomText(rand(4,7));
         }
 
         if(NULL === $font)
@@ -279,6 +279,24 @@ class Image
     public function getCaptchaImage()
     {
         return $this->captchaImage;
+    }
+
+    /**
+     * Function to generate random text
+     *
+     * @param number $length of the target text
+     */
+    public static function getRandomText($len)
+    {
+        $str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        $text = "";
+        for($i = 0;$i<$len;$i++)
+        {
+            $text .= $str[rand(0, strlen($str)-1)];
+        }
+
+        return $text;
     }
 
     /**
